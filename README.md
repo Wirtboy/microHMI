@@ -3,8 +3,7 @@ A simple and reliable microcontroller oriented Human-Machine Interface made with
 
 ## Contents
 
-On the master branch you will find the python script, the .kv file that contains the widget structure, the folders necesary for running the script, the User Guide and a .zip file that contains a standalone executable and its folders.
-
+On the master branch you will find the python script, the .kv file that contains the widget structure, the folders necesary for running the script and the User Guide. Contact me for a standalone executable.
 ## Language and libraries
 
 microHMI is being developed in Python 2.7 using Kivy as its graphic toolkit. You can read all about Python [here](https://www.python.org/) and Kivy over [here](https://kivy.org/#home). 
