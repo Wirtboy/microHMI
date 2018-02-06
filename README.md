@@ -3,7 +3,7 @@ A simple and reliable microcontroller oriented Human-Machine Interface made with
 
 ## Contents
 
-On the master branch you will find the python script, the .kv file that contains the widget structure, the User Guide and a .zip file that contains a standalone executable and its folders.
+On the master branch you will find the python script, the .kv file that contains the widget structure, the folders necesary for running the script, the User Guide and a .zip file that contains a standalone executable and its folders.
 
 ## Language and libraries
 
