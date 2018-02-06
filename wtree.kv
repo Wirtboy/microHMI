@@ -1,0 +1,964 @@
+#:import os os
+
+############## Presentation screen
+<Prescreen>:
+    FloatLayout:
+        Image:
+            id: bcg
+            size_hint: (None, None)
+            size: (self.parent.width, self.parent.height)
+            source: os.getcwd() + '/imgs/UCV3.jpg'
+            allow_stretch: True
+        Button:
+            text: 'Start' if root.hab else 'Loading...'
+            size_hint_y: 0.1
+            size_hint_x: 0.15
+            pos_hint: {'x':.55, 'y':.35}
+            font_size: '24dp'
+            on_release: root.chsc(self.text)
+        Label:
+            markup: True
+            text: '[b] microHMI [/b]'
+            font_size: '40dp'
+            pos_hint:  {'x': .35, 'y': .6}
+            size_hint: (None, None)
+        Label:
+            markup: True
+            text: '[b] A light and reliable microcontroller oriented Human-Machine Interface[/b]'
+            text_size: 380, 300
+            font_size: '24dp'
+            pos_hint: {'x': .35, 'y': .65}
+            size_hint: (None, None)
+            halign: 'center'
+        Label:
+            markup: True
+            text: '[b] v1.0 \n Copyright Hector Monzon, 2018 \n Under MIT license [/b]'
+            font_size: '14dp'
+            pos_hint: {'x': .45, 'y': .05}
+            size_hint: (None, None)
+        Hyper:
+            markup: True
+            text: '[u] www.opensource.org/licenses/mit-license.php [/u]'
+            font_size: '14dp'
+            pos_hint: {'x': .5, 'y': .002}
+            size_hint: (None, None)
+            color: (0,0,1,1)
+
+############## Database screen
+<Tempop>:
+    size_hint : None, None
+    size: 200,120
+    Label:
+        id: yo
+        text: 'Saved!'
+
+<Savepop>:
+    title: 'Export'
+    size_hint: None, None
+    size: 300, 180
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            size_hint_y: None
+            height: 40
+            text: 'File name'
+        TextInput:
+            id: flnm
+            write_tab: False
+        BoxLayout:
+            size_hint_y: None
+            height: 40
+            Button:
+                text: 'OK'
+                on_release: root.caller.export(flnm.text) if (not root.preporter and not root.areporter) else (root.caller.reportdb(flnm.text) if root.preporter else root.caller.reportal(flnm.text))
+                on_release: root.dismiss()
+            Button:
+                text: 'Cancel'
+                on_release: root.dismiss()
+
+<RTUPopup>:
+    auto_dismiss: False
+    title: 'New remote configuration'
+    size_hint: (None, None)
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint:0.4, 0.1
+            Label:
+                text: 'Name'
+            TextInput:
+                id: rname
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            TabbedPanel:
+                id: digitabs
+                do_default_tab: False
+                Digitab:
+                    id: digi1
+            TabbedPanel:
+                id: anatabs
+                do_default_tab: False
+                Anatab:
+                    id: ana1
+                Ptab:
+                    id: p1
+        BoxLayout:
+            size_hint_y: 0.1
+            Button:
+                text: 'OK'
+                on_release: root.comrtu()
+                on_release: if not rname.text == '': root.dismiss()
+            Button:
+                text: 'Cancel'
+                on_release: root.rollrtu()
+                on_release: root.dismiss()
+
+<Chpop>:
+    size_hint: None, None
+    size: 400, 400
+    title: 'Select file'
+    BoxLayout:
+        orientation: 'vertical'
+        FileChooserIconView:
+            id: fch
+            height: 300
+            filters: ['*.txt'] if not root.imager else ['*.png', '*.bmp', '*.jpg', '*.jpeg', '*.tif']
+        BoxLayout:
+            size_hint_y: None
+            height: 40
+            Button:
+                text: 'OK'
+                on_release: root.load(fch.path,fch.selection) if not root.imager else root.caller.setbg(fch.path,fch.selection)
+                on_release: root.dismiss()
+            Button:
+                text: 'Cancel'
+                on_release: root.dismiss()
+
+<Digitab>:
+    text: ('Digital' if tag.text=='' else tag.text)
+    BoxLayout:
+        id: dad
+        spacing: 42
+        orientation: 'vertical'
+        BoxLayout:
+            height: '48dp'
+            Label:
+                text: 'Pin mode'
+            Select:
+                id: pinmode
+                text: 'IN'
+        BoxLayout:
+            height: '48dp'
+            Label:
+                text: 'Tag'
+            TextInput:
+                id: tag
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            height: '48dp'
+            Label:
+                text: 'Alarm'
+            Cheeky:
+                id: norstat
+                mode: pinmode.text
+        BoxLayout:
+            height: '48dp'
+            Label:
+                text: 'Description'
+            TextInput:
+                id: descrip
+                write_tab: False
+                size_hint_y: None
+                height: self.minimum_height
+        BoxLayout:
+            height: '48dp'
+            Label:
+                text: 'Pin number'
+            FloatInput:
+                id: pin
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            height: '48dp'
+            Button:
+                text: 'New'
+                on_release: root.newtab(root.parent.parent.parent.parent.parent.parent.parent.parent.parent.ids['rname'].text)
+            Button:
+                text:'Save'
+                on_release: root.savedp(tag.text,norstat.active,descrip.text,pin.text,pinmode.text)
+            Button:
+                text: 'Clear'
+                on_release: tag.text=''
+                on_release: descrip.text=''
+                on_release: pin.text=''
+            Button:
+                text: 'Erase'
+                on_release: root.erasept()
+
+<Ptab>:
+    text: ('PWM' if tag.text=='' else tag.text)
+    BoxLayout:
+        spacing:30
+        orientation: 'vertical'
+        BoxLayout:
+            size_hint_y: 0.02
+            Label:
+                text: 'Pin mode'
+            Select:
+                id: pinmode
+                text: 'PWM (OUT)'
+                on_release: root.chtab(root.parent.parent.parent.parent.parent.parent.parent.parent.parent.ids['rname'].text)
+        BoxLayout:
+            size_hint_y:0.02
+            Label:
+                text: 'Tag'
+            TextInput:
+                id: tag
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            size_hint_y:0.02
+            Label:
+                text: 'Description'
+            TextInput:
+                id: descrip
+                multiline: False
+                write_tab: False
+                height: self.minimum_height
+                size_hint_y: None
+        BoxLayout:
+            size_hint_y:0.02
+            Label:
+                text: 'Minimum'
+            FloatInput:
+                id: mini
+                multiline: False
+                write_tab: False
+                size_hint_x: 0.33
+            Label:
+                text: 'Unit'
+                size_hint_x: 0.3
+            TextInput:
+                id: unit
+                multiline: False
+                write_tab: False
+                size_hint_x: 0.4
+        BoxLayout:
+            size_hint_y:0.02
+            Label:
+                text: 'Maximum'
+            FloatInput:
+                id: maxi
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            size_hint_y:0.02
+            Label:
+                text: 'Pin number'
+            FloatInput:
+                id: pin
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            size_hint_y: 0.02
+            Button:
+                text: 'New'
+                on_release: root.newtab(root.parent.parent.parent.parent.parent.parent.parent.parent.parent.ids['rname'].text)
+            Button:
+                text:'Save'
+                on_release: root.savepp(tag.text,descrip.text,pin.text,pinmode.text,maxi.text,mini.text,unit.text)
+            Button:
+                text: 'Clear'
+                on_release: tag.text=''
+                on_release: descrip.text=''
+                on_release: pin.text=''
+                on_release: unit.text=''
+                on_release: maxi.text=''
+                on_release: mini.text=''
+            Button:
+                text: 'Erase'
+                on_release: root.erasept()
+
+<Anatab>:
+    text: ('Analogic' if tag.text=='' else tag.text)
+    BoxLayout:
+        spacing:8.5
+        orientation: 'vertical'
+        BoxLayout:
+            Label:
+                text: 'Pin mode'
+            Select:
+                id: pinmode
+                text: 'Input'
+                on_release: root.chtab(root.parent.parent.parent.parent.parent.parent.parent.parent.parent.ids['rname'].text)
+        BoxLayout:
+            Label:
+                text: 'Tag'
+            TextInput:
+                id: tag
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            Label:
+                text: 'Description'
+            TextInput:
+                id: descrip
+                multiline: False
+                write_tab: False
+                height: self.minimum_height
+                size_hint_y: None
+        BoxLayout:
+            Label:
+                text: 'Critical Low Limit'
+            FloatInput:
+                id: LL
+                multiline: False
+                write_tab: False
+                size_hint_x: 0.33
+            Label:
+                text: 'Unit'
+                size_hint_x: 0.3
+            TextInput:
+                id: unit
+                multiline: False
+                write_tab: False
+                size_hint_x: 0.4
+        BoxLayout:
+            Label:
+                text: 'Low Limit'
+            FloatInput:
+                id: L
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            Label:
+                text: 'High Limit'
+            FloatInput:
+                id: H
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            Label:
+                text: 'Critical High Limit'
+            FloatInput:
+                id: HH
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            Label:
+                text: 'Pin number'
+            FloatInput:
+                id: pin
+                multiline: False
+                write_tab: False
+        BoxLayout:
+            Label:
+                text: 'Graphic'
+            CheckBox:
+                id: gr
+        BoxLayout:
+            Button:
+                text: 'New'
+                on_release: root.newtab(root.parent.parent.parent.parent.parent.parent.parent.parent.parent.ids['rname'].text)
+            Button:
+                text:'Save'
+                on_release: root.saveap(tag.text,descrip.text,L.text,LL.text,H.text,HH.text,pin.text,pinmode.text,gr.active,unit.text)
+            Button:
+                text: 'Clear'
+                on_release: tag.text=''
+                on_release: descrip.text=''
+                on_release: pin.text=''
+                on_release: L.text=''
+                on_release: LL.text=''
+                on_release: H.text=''
+                on_release: HH.text=''
+                on_release: unit.text=''
+                on_release: root.clrap()
+            Button:
+                text: 'Erase'
+                on_release: root.erasept()
+
+<DBScreen>:
+    BoxLayout:
+        id: DBS
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_x: 0.2
+            Button:
+                font_size: '18sp'
+                text: 'New remote'
+                on_release: root.pop()
+            Button:
+                font_size: '18sp'
+                text: 'Erase remote'
+                on_press:RTUlst.erase(RTUlst.sel)
+            Button:
+                font_size: '18sp'
+                text: 'Import remote'
+                on_release: root.loaddb()
+            Button:
+                font_size: '18sp'
+                text: 'Export remote'
+                on_release: root.svpop()
+            Button:
+                font_size: '18sp'
+                text: 'Go to Display'
+                on_release: root.manager.current='ihmsc'
+            Button:
+                font_size: '18sp'
+                text: 'Go to Alarms/Trends'
+                on_release: root.manager.current='almsc'
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_x: 0.8
+            Label:
+                size_hint_y: None
+                height: 60
+                font_size: '20sp'
+                halign: 'center'
+                valign: 'middle'
+                text: 'Remotes'
+                color: (0,0,0,1)
+            Lista:
+                id: RTUlst
+                cols: 1
+
+############## HMI screen
+<DBPopup>:
+    size_hint: None, None
+    size: 400, 300
+    title: 'Link element'
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            Label:
+                text: 'Remote'
+            Spinner:
+                text_autoupdate: True
+                id: rspin
+                text: 'Select'
+                on_text: if not self.text == 'Select': ptspin1.upvalues(self.text)
+        BoxLayout:
+            Label:
+                text: 'Point'
+            Ptspin:
+                id: ptspin1
+                text: 'Select'
+        BoxLayout:
+            size_hint_y: 0.4
+            Button:
+                text:'OK'
+                on_release: if root.target_element.ass: root.dismiss()
+                on_release: if not root.target_element.ass and ptspin1.text != 'Select': root.save()
+            Button:
+                text: 'Cancel'
+                on_release: root.dismiss()
+
+<Selectpop>:
+    title: 'Select digital widget'
+    size_hint: None, None
+    size: 300, 150
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            Button:
+                on_release: root.caller.newblinker(i1.source) if root.typ == 'd' else (root.caller.newigage(i1.source) if root.typ == 'a' else root.caller.newogage(i1.source))
+                on_release: root.dismiss()
+                Image:
+                    id: i1
+                    source: os.getcwd() + '/imgs/blinkeron.png'
+                    center: self.parent.center
+                    allow_stretch: True
+                    size: 30, 30
+            Button:
+                on_release: root.caller.newblinker(i2.source) if root.typ == 'd' else (root.caller.newigage(i2.source) if root.typ == 'a' else root.caller.newogage(i2.source))
+                on_release: root.dismiss()
+                Image:
+                    id: i2
+                    source: os.getcwd() + '/imgs/valveon.png'
+                    center: self.parent.center
+                    allow_stretch: True
+                    size: 60, 60
+            Button:
+                id: bi3
+                on_release: root.caller.newblinker(i3.source) if root.typ == 'd' else (root.caller.newigage(i3.source) if root.typ == 'a' else root.caller.newogage(i3.source))
+                on_release: root.dismiss()
+                Image:
+                    id: i3
+                    source: os.getcwd() + '/imgs/pumpon.png'
+                    center: self.parent.center
+                    allow_stretch: True
+                    size: 50, 50
+
+<Portpop>:
+    title: 'Select port'
+    size_hint: None, None
+    size: 300, 200
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Indicate port for {}'.format(root.myrem)
+        Spinner:
+            text: 'Connect remote'
+            id: ptspin1
+            on_touch_down: root.checkport()
+        BoxLayout:
+            Button:
+                text: 'OK'
+                on_press: if ptspin1.text != 'Connect remote': root.assport(root.myrem)
+                on_press: if ptspin1.text != 'Connect remote': root.dismiss()
+            Button:
+                text: 'Cancel'
+                on_press: root.dismiss()
+
+<Blinker>:
+    state: 'OFF' if self.value == 0 else 'ON'
+    drag_rectangle:self.x, self.y, self.width, self.height
+    canvas:
+        Color:
+            rgba:
+                (
+                (1, 0, 0, 1) if self.value == 0 else
+                (0, 1, 0, 1)
+                )
+        Rectangle:
+            group: 'icon'
+            pos: self.pos
+            size: self.width,self.height
+    Label:
+        text: '{}\n{}'.format(root.name,root.state)
+        size: self.texture_size
+        center_x: self.width and root.center_x
+        top: self.height and root.y
+        color: (0,0,0,1)
+        text_size: (150, None)
+
+<Ingage>:
+    drag_rectangle: self.x, self.y, self.width, self.height
+    drag_timeout: 10000000
+    drag_distance: 0
+    canvas.after:
+        Color:
+            rgba:
+                (
+                (1, 0, 0, 1) if self.value <= self.cl or self.value >= self.ch else
+                (1, 1, 0, 1) if self.value < self.l or self.value > self.h else
+                (0, 1, 0, 1)
+                )
+        Rectangle:
+            pos: self.pos
+            size:
+                (
+                (self.width, (self.height * self.value) / self.ch) if self.value < self.ch and self.value > self.cl else
+                (self.width, self.height) if self.value >= self.ch else
+                (0, 0)
+                )
+        Rectangle:
+            pos: self.pos
+            size: self.width, self.height
+            source: os.getcwd() + '/imgs/dvbar2.png'
+    Image:
+        id: tank
+        source: os.getcwd() + '/imgs/tank.png'
+        center_x: (self.width and root.center_x) - 40
+        center_y: (self.height and root.center_y) + 8
+        height: root.height + 120
+        width: root.width + 100
+    Label:
+        text: '{}\n{} {}\n{}'.format(root.name,root.value,root.unit,root.note)
+        size: self.texture_size
+        center_x: self.width and root.center_x
+        top: (self.height and root.y) - 10
+        color: (0,0,0,1)
+        text_size: (150, None)
+
+<Ingageh>:
+    drag_rectangle: self.x, self.y, self.width, self.height
+    drag_timeout: 10000000
+    drag_distance: 0
+    canvas.after:
+        Color:
+            rgba:
+                (
+                (1, 0, 0, 1) if self.value <= self.cl or self.value >= self.ch else
+                (1, 1, 0, 1) if self.value < self.l or self.value > self.h else
+                (0, 1, 0, 1)
+                )
+        Rectangle:
+            pos: self.pos
+            size:
+                (
+                ((self.width * self.value) / self.ch, self.height) if self.value < self.ch and self.value > self.cl else
+                (self.width, self.height) if self.value >= self.ch else
+                (0, 0)
+                )
+        Rectangle:
+            pos: self.pos
+            size: self.width, self.height
+            source: os.getcwd() + '/imgs/dhbar2.png'
+    Label:
+        text: '{}\n{} {}\n{}'.format(root.name,root.value,root.unit,root.note)
+        size: self.texture_size
+        center_x: self.width and root.center_x
+        top: (self.height and root.y) - 5
+        color: (0,0,0,1)
+        text_size: (150, None)
+
+<Outgage>:
+    drag_rectangle: self.x, self.y, self.width, self.height
+    drag_timeout: 10000000
+    drag_distance: 0
+    canvas:
+        Color:
+            rgba:(0, 1, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.width, (self.height if self.slide else self.height*self.cntv)
+        Rectangle:
+            pos: self.pos
+            size: self.width, self.height
+            source: os.getcwd() + '/imgs/dvbar2.png'
+    Slider:
+        id: cnt
+        orientation: 'vertical'
+        pos: (root.x + 20 , root.y + 0)
+        height: root.height
+    Label:
+        text: '{}\n{} {}\n{}'.format(root.name,cnt.value,root.unit,root.note)
+        size: self.texture_size
+        center_x: self.width and root.center_x
+        top: self.height and root.y
+        color: (0,0,0,1)
+        text_size: (150, None)
+
+<Outgageh>:
+    drag_rectangle: self.x, self.y, self.width, self.height
+    drag_timeout: 10000000
+    drag_distance: 0
+    canvas:
+        Color:
+            rgba:(0, 1, 0, 1)
+        Rectangle:
+            pos: self.pos
+            size: (self.width if self.slide else self.width*self.cntv), self.height
+        Rectangle:
+            pos: self.pos
+            size: self.width, self.height
+            source: os.getcwd() + '/imgs/dhbar2.png'
+    Slider:
+        id: cnt
+        pos: (root.x, root.y - 40)
+        height: root.height
+    Label:
+        text: '{}\n{} {}\n{}'.format(root.name,cnt.value,root.unit,root.note)
+        size: self.texture_size
+        center_x: self.width and root.center_x
+        top: self.height and root.y - 45
+        color: (0,0,0,1)
+        text_size: (150, None)
+
+<Textbox>:
+    background_color: (0,0,0,0)
+    width: 120
+    height: self.minimum_height
+
+<Toolbar>:
+    cols: 2
+    Button:
+        text: '\n \n \nStart'
+        width: 50
+        font_size: '12dp'
+        on_release: root.parent.portsel()
+        Image:
+            source: os.getcwd() + '/imgs/play.png'
+            center_y: self.parent.center_y + 15
+            x: self.parent.x + 10
+            allow_stretch: True
+            size: 30, 30
+    Button:
+        text: '\n \n \nStop'
+        on_release: root.parent.stahp()
+        width: 50
+        font_size: '12dp'
+        Image:
+            source: os.getcwd() + '/imgs/stop.png'
+            center_y: self.parent.center_y + 15
+            center_x: self.parent.center_x
+            allow_stretch: True
+            size: 30, 30
+    Button:
+        text: '\n \n \nRestart'
+        on_press: root.parent.reset()
+        width: 50
+        font_size: '11dp'
+        Image:
+            source: os.getcwd() + '/imgs/restart.png'
+            center_y: self.parent.center_y + 20
+            x: self.parent.x + 15
+            allow_stretch: True
+            size: 25, 25
+    Button:
+        text: '\n \n \n   Erase \nelement'
+        width: 50
+        font_size: '10dp'
+        on_release: if root.parent.selmn: root.parent.remove_widget(root.parent.selected)
+        on_release: if root.parent.selmn: root.parent.canvas.after.remove(root.parent.touches)
+        Image:
+            source: os.getcwd() + '/imgs/delete.png'
+            center_y: self.parent.center_y + 20
+            center_x: self.parent.center_x
+            allow_stretch: True
+            size: 25, 25
+    Button:
+        text: '\n \n \n   DI / \n   DO'
+        on_press: root.parent.selpop('d')
+        width: 50
+        font_size: '12dp'
+        Image:
+            source: os.getcwd() + '/imgs/blinkeron.png'
+            center_y: self.parent.center_y + 15
+            x: self.parent.x + 15
+            allow_stretch: True
+            size: 20, 20
+    Button:
+        text: '\n \n \nAI'
+        on_press: root.parent.selpop('a')
+        font_size: '12dp'
+        width: 50
+        Image:
+            source: os.getcwd() + '/imgs/dvbarfull.png'
+            center_y: self.parent.center_y + 15
+            center_x: self.parent.center_x
+            allow_stretch: True
+            size: 10, 40
+    Button:
+        text: '\n \n \n    AO \n(PWM)'
+        on_press: root.parent.selpop('p')
+        font_size: '12dp'
+        width: 50
+        Image:
+            source: os.getcwd() + '/imgs/barslider.png'
+            center_y: self.parent.center_y + 15
+            x: self.parent.x + 15
+            allow_stretch: True
+            size: 30, 120
+    Button:
+        text: 'T'
+        width: 50
+        font_size: '32dp'
+        font_color: (0,0,0,1)
+        on_release: root.parent.textbox()
+    Button:
+        text: '\n \n \n  Data \n  base'
+        on_release: root.parent.parent.manager.current='dbsc'
+        width: 50
+        font_size: '12dp'
+        Image:
+            source: os.getcwd() + '/imgs/database.png'
+            center_y: self.parent.center_y + 15
+            x: self.parent.x + 10
+            allow_stretch: True
+            size: 30, 30
+    Button:
+        text: '\n \n \nReport'
+        width: 50
+        font_size: '12dp'
+        on_release: root.parent.repop()
+        Image:
+            source: os.getcwd() + '/imgs/report.png'
+            center_y: self.parent.center_y + 15
+            center_x: self.parent.center_x
+            allow_stretch: True
+            size: 30, 30
+    Button:
+        text: '\n \n  \n  Alarms/ \n  Trends'
+        width: 50
+        font_size: '10dp'
+        on_press: root.parent.parent.manager.current='almsc'
+        Image:
+            source: os.getcwd() + '/imgs/alarm.png'
+            center_y: self.parent.center_y + 15
+            x: self.parent.x + 10
+            allow_stretch: True
+            size: 30, 30
+    Button:
+        text: '\n \n \n Backgd \n  image'
+        width: 50
+        font_size: '12dp'
+        on_release: root.parent.bgpop()
+        Image:
+            source: os.getcwd() + '/imgs/image.png'
+            center_y: self.parent.center_y + 15
+            center_x: self.parent.center_x
+            allow_stretch: True
+            size: 30, 30
+
+<MyLayout>:
+    Toolbar:
+        size: 100, 700
+        pos: 0,0
+        top: root.top
+    Label:
+        text: '{0}\n{1}'.format(root.rtime,root.rdate)
+        pos: root.right - 150, 10
+        color: (0,0,0,1)
+        font_size: '18dp'
+    Button:
+        pos: 800, 5000
+        size: 80,80
+        id: almb
+        on_release: root.parent.manager.current='almsc'
+        on_release: self.y=5000
+        on_release: root.checked=True
+        Image:
+            source: os.getcwd() + '/imgs/alarmon.png'
+            y: self.parent.y + 17
+            x: self.parent.x + 17
+            allow_stretch: True
+            size: 50, 50
+
+<HMIscreen>:
+    MyLayout:
+        size: root.size
+        id: ihm
+
+############## Arbol de widgets de la tercera pantalla - Alarmas
+<AlarmScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        PlotArea:
+            id: ATbox
+            BoxLayout:
+                canvas:
+                    Color:
+                        rgba: (0, 0, 0, 1)
+                    Rectangle:
+                        pos: self.pos
+                        size: self.width, self.height
+                spacing: 5
+                size_hint_x: 0.1
+                orientation: 'vertical'
+                BoxLayout:
+                    Gcheck:
+                        id: gtog1
+                        myplot: '0'
+                    Label:
+                        id: pl1
+                        text: 'Value 1'
+                        color: 0,0,1,1
+                BoxLayout:
+                    Gcheck:
+                        id: gtog2
+                        myplot: '1'
+                    Label:
+                        id: pl2
+                        text: 'Value 2'
+                        color: 0.4,0.2,0.6,1
+                BoxLayout:
+                    Gcheck:
+                        id: gtog3
+                        myplot: '2'
+                    Label:
+                        id: pl3
+                        text: 'Value 3'
+                        color: 0.9,0.9,0.05,1
+                BoxLayout:
+                    Gcheck:
+                        id: gtog4
+                        myplot: '3'
+                    Label:
+                        id: pl4
+                        text: 'Value 4'
+                        color: 0.11,0.95,0.93,1
+            BoxLayout:
+                orientation: 'vertical'
+                Graph:
+                    id: grafi
+                    x_ticks_minor: 5
+                    x_ticks_major: self.xmax/6
+                    y_ticks_major: self.ymax/10
+                    y_grid_label: True
+                    padding: 5
+                    x_grid: True
+                    y_grid: True
+                    xmin: -0
+                    xmax: 60
+                    ymin: 0
+                    ymax: 200
+                    background_color: (0,0,0,1)
+                BoxLayout:
+                    size_hint_y: None
+                    height: 30
+                    spacing: 30
+                    canvas:
+                        Color:
+                            rgba: (0, 0, 0, 1)
+                        Rectangle:
+                            pos: self.pos
+                            size: self.width, self.height
+                    Label:
+                        id: t1
+                        text: 'HH:MM:SS'
+                    Label:
+                        id: t2
+                        text: 'HH:MM:SS'
+                    Label:
+                        id: t3
+                        text: 'HH:MM:SS'
+                    Label:
+                        id: t4
+                        text: 'HH:MM:SS'
+                    Label:
+                        id: t5
+                        text: 'HH:MM:SS'
+                    Label:
+                        id: t6
+                        text: 'HH:MM:SS'
+        Label:
+            size_hint_y: 0.15
+            font_size: '16sp'
+            text: 'Alarms'
+            color: (0,0,0,1)
+        BoxLayout:
+            size_hint_y: 0.05
+            spacing: 20
+            Label:
+                color: (0,0,0,1)
+                text: 'hh:mm:ss'
+            Label:
+                color: (0,0,0,1)
+                text: 'Tag'
+            Label:
+                color: (0,0,0,1)
+                text: 'Value'
+            Label:
+                color: (0,0,0,1)
+                text: 'Event'
+            Label:
+                color: (0,0,0,1)
+                text: 'Description'
+        ScrollView:
+            size: self.width, 200
+            size_hint_y: None
+            do_scroll_x: False
+            Alarms:
+                rtulst: False
+                id: alms
+                cols: 1
+                size_hint_y: None
+                height: 400
+                width: self.parent.width
+        BoxLayout:
+            size_hint_y: 0.1
+            Button:
+                text: 'Go to display'
+                on_release: root.manager.get_screen('ihmsc').ids.ihm.checked=False
+                on_release: root.manager.current='ihmsc'
+            Button:
+                text: 'Go to database'
+                on_release: if not root.manager.get_screen('ihmsc').ids.ihm.running : root.manager.current='dbsc'
+            Button:
+                text: 'Report alarms'
+                on_release: root.alpop()
