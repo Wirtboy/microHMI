@@ -1,0 +1,8 @@
+
+RTUs: Nano, COM3
+
+Dpoints: OUT, Yellow, N, Led Amarillo 1, 8; IN, Cable, S, Testing digi in, 6
+
+Apoints: Poten1, Testing ana in, 100, 150, 250, 300, cm, 1, S
+
+Ppoints: Blue, Led azul fading, 500, 300, kw, 11

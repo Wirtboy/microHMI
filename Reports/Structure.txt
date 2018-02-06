@@ -1,0 +1,7 @@
+RTUs: Nombre, Puerto
+
+Dpoints (Puntos digitales): Modo de pin, Etiqueta, Alarmar (S - si, N - no), Descripcion, Numero de pin
+
+Apoints (puntos analogicos): Etiqueta, Descripcion, Limite bajo critico, Limite bajo, Limite alto, Limite- alto critico, Unidades, Numero de pin, Graficar (S - si, N - no)
+
+Ppoints: Etiqueta, Descripcion, Maximo, Minimo, Numero de pin
