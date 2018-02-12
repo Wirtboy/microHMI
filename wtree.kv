@@ -70,7 +70,7 @@
             height: 40
             Button:
                 text: 'OK'
-                on_release: root.caller.export(flnm.text) if (not root.preporter and not root.areporter) else (root.caller.reportdb(flnm.text) if root.preporter else root.caller.reportal(flnm.text))
+                on_release: root.caller.export(flnm.text, root.dbaser, '') if (not root.preporter and not root.areporter) else (root.caller.reportrd(flnm.text) if root.preporter else root.caller.reportal(flnm.text))
                 on_release: root.dismiss()
             Button:
                 text: 'Cancel'
@@ -108,7 +108,7 @@
             Button:
                 text: 'OK'
                 on_release: root.comrtu()
-                on_release: if not rname.text == '': root.dismiss()
+                on_release: if not rname.text == '' and rname.text not in root.caller.myrtus: root.dismiss()
             Button:
                 text: 'Cancel'
                 on_release: root.rollrtu()
@@ -122,6 +122,7 @@
         orientation: 'vertical'
         FileChooserIconView:
             id: fch
+            rootpath: os.getcwd() + "/Reports"
             height: 300
             filters: ['*.txt'] if not root.imager else ['*.png', '*.bmp', '*.jpg', '*.jpeg', '*.tif']
         BoxLayout:
@@ -129,7 +130,7 @@
             height: 40
             Button:
                 text: 'OK'
-                on_release: root.load(fch.path,fch.selection) if not root.imager else root.caller.setbg(fch.path,fch.selection)
+                on_release: root.load(fch.selection) if not root.imager else root.caller.setbg(fch.selection)
                 on_release: root.dismiss()
             Button:
                 text: 'Cancel'
@@ -397,11 +398,19 @@
             Button:
                 font_size: '18sp'
                 text: 'Import remote'
-                on_release: root.loaddb()
+                on_release: root.loadpop(False)
             Button:
                 font_size: '18sp'
                 text: 'Export remote'
-                on_release: root.svpop()
+                on_release: root.svpop(False)
+            Button:
+                font_size: '18sp'
+                text: 'Import database'
+                on_release: root.loadpop(True)
+            Button:
+                font_size: '18sp'
+                text: 'Export database'
+                on_release: root.svpop(True)
             Button:
                 font_size: '18sp'
                 text: 'Go to Display'
@@ -464,7 +473,7 @@
         orientation: 'vertical'
         BoxLayout:
             Button:
-                on_release: root.caller.newblinker(i1.source) if root.typ == 'd' else (root.caller.newigage(i1.source) if root.typ == 'a' else root.caller.newogage(i1.source))
+                on_release: root.caller.add_widget(root.caller.newblinker('a', '', '0', '0')) if root.typ == 'd' else (root.caller.add_widget(root.caller.newigage('a', '', '0', '0')) if root.typ == 'a' else root.caller.add_widget(root.caller.newogage('a', '', '0', '0')))
                 on_release: root.dismiss()
                 Image:
                     id: i1
@@ -473,7 +482,7 @@
                     allow_stretch: True
                     size: 30, 30
             Button:
-                on_release: root.caller.newblinker(i2.source) if root.typ == 'd' else (root.caller.newigage(i2.source) if root.typ == 'a' else root.caller.newogage(i2.source))
+                on_release: root.caller.add_widget(root.caller.newblinker('b', '', '0', '0')) if root.typ == 'd' else (root.caller.add_widget(root.caller.newigage('b', '', '0', '0')) if root.typ == 'a' else root.caller.add_widget(root.caller.newogage('b', '', '0', '0')))
                 on_release: root.dismiss()
                 Image:
                     id: i2
@@ -483,7 +492,7 @@
                     size: 60, 60
             Button:
                 id: bi3
-                on_release: root.caller.newblinker(i3.source) if root.typ == 'd' else (root.caller.newigage(i3.source) if root.typ == 'a' else root.caller.newogage(i3.source))
+                on_release: root.caller.add_widget(root.caller.newblinker('c', '', '0', '0')) if root.typ == 'd' else (root.caller.add_widget(root.caller.newigage('c', '', '0', '0')) if root.typ == 'a' else root.caller.add_widget(root.caller.newogage('c', '', '0', '0')))
                 on_release: root.dismiss()
                 Image:
                     id: i3
@@ -796,6 +805,29 @@
             size: 30, 30
 
 <MyLayout>:
+    Ptspin:
+        id: dpspin
+        text: 'Load display'
+        size: 150, 50
+        top: root.top
+        pos: 100, 0
+        on_touch_down: self.setdps()
+        on_text: if not self.text == 'Load display': root.loaddp(self.text)
+    BoxLayout:
+        size: 500, 40
+        top: root.top
+        right: root.right
+        pos: 100, 0
+        Spinner:
+            id: remsel
+            text: 'Select remote'
+            on_text: if not self.text == 'Select remote': root.myrem = self.text
+        Label:
+            text: 'Display name'
+            color: (0,0,0,1)
+            size_hint_x: 0.5
+        TextInput:
+            id: dpname
     Toolbar:
         size: 100, 700
         pos: 0,0
