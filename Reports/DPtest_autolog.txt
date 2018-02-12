@@ -1,0 +1,7 @@
+RTU: Nano
+
+Dpoints: IN, Valve, S, Inbound valve, 8
+
+Apoints: Temptank, Temperature of water tank, 2, 3, 4, 6, C,1, S
+
+Ppoints: Motor, Inbound motor, 3, 0, RPM,11
