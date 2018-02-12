@@ -1,0 +1,8 @@
+DPtest-Nano
+
+p,b,Motor,628.0,178.5;
+
+a,a,Temptank,341.5,326.0;
+
+d,b,Valve,692.0,543.0;
+
